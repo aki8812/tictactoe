@@ -1,0 +1,20 @@
+{
+  "name": "井字遊戲模擬",
+  "short_name": "井字遊戲模擬",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f0f8ff",
+  "theme_color": "#ffeb3b",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "icon/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
