@@ -1,11 +1,11 @@
 {
-  "name": "AI Image",
-  "short_name": "AI Image",
-  "description": "AI生成圖片",
+  "name": "井字遊戲模擬",
+  "short_name": "井字遊戲模擬",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#111827",
+  "description": "井字遊戲模擬",
+  "background_color": "#f0f8ff",
+  "theme_color": "#f0f8ff",
   "icons": [
     {
       "src": "icon/icon-512x512.png",
