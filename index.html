@@ -75,11 +75,13 @@
             background-color: rgba(255, 255, 255, 0.9);
             text-align: center;
             -webkit-appearance: none;
+            appearance: none;
             margin: 0;
         }
 
         .input-row input[type=number] {
             -moz-appearance: textfield;
+            appearance: textfield;
         }
 
         .input-row input:disabled {
@@ -453,7 +455,7 @@
                 let draws = 0, xWins = 0, oWins = 0;
                 let minW = 2 * K - 1;
                 if (minW < 1) minW = 1;
-                let chunk = 5000;
+                let lastYield = performance.now();
 
                 for (let i = 0; i < sims; i++) {
                     if (!isRunning) break;
@@ -476,24 +478,31 @@
                         if (w === 'X') xWins++; else oWins++;
                     } else draws++;
 
-                    if ((i + 1) % chunk === 0) {
-                        let done = i + 1;
-                        pBar.style.width = (done / sims * 100) + '%';
-                        status.textContent = `模擬進行中... ${Math.round(done / sims * 100)}%`;
+                    // 效能優化：每 500 次檢查一次時間，降低效能開銷
+                    if ((i + 1) % 500 === 0) {
+                        let now = performance.now();
+                        // 解決手機端進度條卡頓/跳躍：確保相鄰兩次 UI 渲染間隔至少 40ms（避免堵塞主執行緒）
+                        if (now - lastYield > 40) {
+                            let done = i + 1;
+                            pBar.style.width = (done / sims * 100) + '%';
+                            status.textContent = `模擬進行中... ${Math.round(done / sims * 100)}%`;
 
-                        document.getElementById('txt-total').textContent = done.toLocaleString();
-                        document.getElementById('txt-xrate').textContent = (xWins / done * 100).toFixed(1) + '%';
-                        document.getElementById('txt-orate').textContent = (oWins / done * 100).toFixed(1) + '%';
-                        document.getElementById('txt-drate').textContent = (draws / done * 100).toFixed(1) + '%';
+                            document.getElementById('txt-total').textContent = done.toLocaleString();
+                            document.getElementById('txt-xrate').textContent = (xWins / done * 100).toFixed(1) + '%';
+                            document.getElementById('txt-orate').textContent = (oWins / done * 100).toFixed(1) + '%';
+                            document.getElementById('txt-drate').textContent = (draws / done * 100).toFixed(1) + '%';
 
-                        for (let m = minW; m <= TotalCells; m++) {
-                            let el = document.getElementById('res-' + m);
-                            if (el) el.textContent = res[m].toLocaleString();
+                            for (let m = minW; m <= TotalCells; m++) {
+                                let el = document.getElementById('res-' + m);
+                                if (el) el.textContent = res[m].toLocaleString();
+                            }
+                            let elD = document.getElementById('res-draw');
+                            if (elD) elD.textContent = draws.toLocaleString();
+
+                            // 雙重保證：讓手機端瀏覽器強制進行一幀的 UI 重繪
+                            await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+                            lastYield = performance.now();
                         }
-                        let elD = document.getElementById('res-draw');
-                        if (elD) elD.textContent = draws.toLocaleString();
-
-                        await new Promise(r => setTimeout(r, 0));
                     }
                 }
 
