@@ -1,15 +1,21 @@
 {
-    "name": "碼錶與計時器",
-    "short_name": "碼錶計時",
-    "start_url": "./index.html",
-    "display": "standalone",
-    "background_color": "#2c2f33",
-    "theme_color": "#2c2f33",
-    "icons": [
-        {
-            "src": "icon/icon-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "name": "井字遊戲模擬",
+  "short_name": "井字遊戲模擬",
+  "start_url": "/",
+  "display": "standalone",
+  "description": "井字遊戲模擬",
+  "background_color": "#f0f8ff",
+  "theme_color": "#f0f8ff",
+  "icons": [
+    {
+      "src": "icon/icon-512x512.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }

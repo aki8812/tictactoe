@@ -4,91 +4,530 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>碼錶與計時器</title>
-    <link rel="icon" href="favicon.ico">
-    <link rel="manifest" href="manifest.json">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Roboto+Mono:wght@300;400;500&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>井字遊戲模擬</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#f0f8ff" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon/icon-512x512.png">
+    <style>
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f8ff;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #ffeb3b;
+            border-radius: 6px;
+            border: 3px solid #f0f8ff;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #fdd835;
+        }
+
+        body {
+            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        #input-area {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-row label {
+            font-size: 14px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .input-row input {
+            width: 80px;
+            padding: 5px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+        }
+
+        .input-row input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .input-row input:disabled {
+            background-color: #eee;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .controls {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 300px;
+        }
+
+        canvas {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        button {
+            background-color: #ffeb3b;
+            color: #333;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        button:hover {
+            background-color: #fdd835;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #555;
+            min-height: 25px;
+            font-weight: bold;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 15px;
+            overflow: hidden;
+            height: 10px;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #ffeb3b;
+            transition: width 0.1s linear;
+        }
+
+        #results-grid {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .result-box {
+            background-color: #f0f8ff;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .result-box h3 {
+            margin: 0 0 5px 0;
+            color: #007acc;
+            font-size: 12px;
+        }
+
+        .result-box p {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .win-mark {
+            font-size: 12px;
+            margin-left: 3px;
+        }
+
+        .mark-x {
+            color: #d32f2f;
+        }
+
+        .mark-o {
+            color: #1976d2;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="mode-switch">
-        <button id="btn-stopwatch" class="active">碼錶</button>
-        <button id="btn-timer">計時器</button>
+
+    <div id="input-area">
+        <div class="input-row"><label>模擬次數</label><input type="number" id="inp-sims" value="1000000"></div>
+        <div class="input-row"><label>m (水平)</label><input type="number" id="inp-m" value="3"></div>
+        <div class="input-row"><label>n (垂直)</label><input type="number" id="inp-n" value="3"></div>
+        <div class="input-row"><label>k (連線)</label><input type="number" id="inp-k" value="3"></div>
     </div>
 
-    <div class="app-container">
-        <div id="stopwatch-view" class="view-panel active-view">
-            <div class="time-display">
-                <span id="sw-time">00:00:00</span><span id="sw-ms" class="ms-display">.00</span>
+    <div class="container">
+        <div class="controls">
+            <h1>井字遊戲模擬</h1>
+
+            <button id="btn-start">開始模擬</button>
+            <div id="status">準備就緒</div>
+            <div class="progress-bar-container">
+                <div id="progress-bar"></div>
             </div>
-            <div class="controls">
-                <button id="sw-start" class="btn primary">開始</button>
-                <button id="sw-lap" class="btn secondary" disabled>計圈</button>
-                <button id="sw-reset" class="btn secondary" disabled>重設</button>
-            </div>
-            <div class="laps-container">
-                <ul id="laps-list"></ul>
-            </div>
+
+            <div id="results-grid"></div>
         </div>
 
-        <div id="timer-view" class="view-panel">
-            <div id="timer-input-area" class="input-area active-input">
-                <div class="time-inputs-container">
-                    <div class="input-group">
-                        <input type="number" id="ti-days" min="0" max="99" placeholder="0">
-                        <span>日</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="ti-hours" min="0" max="23" placeholder="0">
-                        <span>時</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="ti-minutes" min="0" max="59" placeholder="0">
-                        <span>分</span>
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="ti-seconds" min="0" max="59" placeholder="0">
-                        <span>秒</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="timer-display-area" class="display-area">
-                <div class="time-display">
-                    <span id="tm-time">00:00:00</span>
-                </div>
-            </div>
-
-            <div class="controls">
-                <button id="tm-start" class="btn primary">開始</button>
-                <button id="tm-reset" class="btn secondary" disabled>重設</button>
-            </div>
+        <div class="canvas-container" id="canvas-area">
+            <canvas id="gameCanvas" width="400" height="400"></canvas>
         </div>
     </div>
 
-    <div id="alert-modal" class="modal-overlay">
-        <div class="modal-content alert-content">
-            <div class="alert-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="#5865f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-            </div>
-            <h2 id="alert-title">時間到！</h2>
-            <p id="alert-message">計時器已結束</p>
-            <button id="alert-close-btn" class="btn primary full-width">確定</button>
-        </div>
-    </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('ServiceWorker registration successful with scope: ', reg.scope))
+                    .catch(err => console.log('ServiceWorker registration failed: ', err));
+            });
+        }
 
-    <div id="aki-footer">Made by Aki</div>
+        (function () {
+            const btnStart = document.getElementById('btn-start');
+            const status = document.getElementById('status');
+            const pBar = document.getElementById('progress-bar');
+            const grid = document.getElementById('results-grid');
+            const cvs = document.getElementById('gameCanvas');
+            const ctx = cvs.getContext('2d');
+            const cvsArea = document.getElementById('canvas-area');
 
-    <script src="script.js"></script>
+            const inpSims = document.getElementById('inp-sims');
+            const inpM = document.getElementById('inp-m');
+            const inpN = document.getElementById('inp-n');
+            const inpK = document.getElementById('inp-k');
+
+            let M, N, K, TotalCells;
+            let winLines = [];
+            let isRunning = false;
+
+            function init() {
+                updateValues();
+                renderGrid();
+                drawBoard();
+
+                [inpM, inpN, inpK].forEach(el => el.addEventListener('change', () => {
+                    updateValues();
+                    renderGrid();
+                    drawBoard();
+                }));
+                btnStart.onclick = runSim;
+            }
+
+            function updateValues() {
+                M = +inpM.value;
+                N = +inpN.value;
+                K = +inpK.value;
+
+                if (M < 1) { M = 1; inpM.value = 1; }
+                if (N < 1) { N = 1; inpN.value = 1; }
+
+                if (K < 2) { K = 2; inpK.value = 2; }
+
+                let maxSide = Math.max(M, N);
+                if (K > maxSide) { K = maxSide; inpK.value = maxSide; }
+                TotalCells = M * N;
+            }
+
+            function getWinLines(m, n, k) {
+                let lines = [];
+                for (let r = 0; r < n; r++)
+                    for (let c = 0; c <= m - k; c++)
+                        lines.push(Array.from({ length: k }, (_, i) => r * m + c + i));
+                for (let c = 0; c < m; c++)
+                    for (let r = 0; r <= n - k; r++)
+                        lines.push(Array.from({ length: k }, (_, i) => (r + i) * m + c));
+                for (let r = 0; r <= n - k; r++)
+                    for (let c = 0; c <= m - k; c++)
+                        lines.push(Array.from({ length: k }, (_, i) => (r + i) * m + c + i));
+                for (let r = 0; r <= n - k; r++)
+                    for (let c = k - 1; c < m; c++)
+                        lines.push(Array.from({ length: k }, (_, i) => (r + i) * m + c - i));
+                return lines;
+            }
+
+            function check(board) {
+                for (let line of winLines) {
+                    let first = board[line[0]];
+                    if (first && line.every(idx => board[idx] === first)) return first;
+                }
+                return null;
+            }
+
+            function getMoves() {
+                let arr = Array.from({ length: TotalCells }, (_, i) => i);
+                for (let i = arr.length - 1; i > 0; i--) {
+                    let j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            function renderGrid() {
+                grid.innerHTML = '';
+
+                let stats = [
+                    { t: '先手勝率', id: 'txt-xrate' }, { t: '後手勝率', id: 'txt-orate' },
+                    { t: '平手率', id: 'txt-drate' }, { t: '總模擬次數', id: 'txt-total' }
+                ];
+                stats.forEach(s => {
+                    grid.innerHTML += `<div class="result-box"><h3>${s.t}</h3><p id="${s.id}">0</p></div>`;
+                });
+
+                let minWin = 2 * K - 1;
+                if (minWin < 1) minWin = 1;
+
+                for (let i = minWin; i <= TotalCells; i++) {
+                    let mark = (i % 2 !== 0) ? '<span class="win-mark mark-x">(X)</span>' : '<span class="win-mark mark-o">(O)</span>';
+                    grid.innerHTML += `<div class="result-box"><h3>第${i}手結束${mark}</h3><p id="res-${i}">0</p></div>`;
+                }
+
+                grid.innerHTML += `<div class="result-box" style="grid-column: span 4"><h3>平手</h3><p id="res-draw">0</p></div>`;
+            }
+
+            function drawBoard() {
+                if (M > 5 || N > 5) {
+                    cvsArea.style.display = 'none';
+                    return;
+                }
+                cvsArea.style.display = 'flex';
+
+                let maxSide = 400;
+                let maxCells = Math.max(M, N);
+                let cellSize = maxSide / maxCells;
+
+                cvs.width = M * cellSize;
+                cvs.height = N * cellSize;
+
+                ctx.clearRect(0, 0, cvs.width, cvs.height);
+                ctx.strokeStyle = '#ccc';
+                ctx.lineWidth = 4;
+
+                for (let i = 1; i < M; i++) {
+                    ctx.beginPath(); ctx.moveTo(i * cellSize, 0); ctx.lineTo(i * cellSize, cvs.height); ctx.stroke();
+                }
+                for (let j = 1; j < N; j++) {
+                    ctx.beginPath(); ctx.moveTo(0, j * cellSize); ctx.lineTo(cvs.width, j * cellSize); ctx.stroke();
+                }
+            }
+
+            function drawPiece(idx, player) {
+                if (cvsArea.style.display === 'none') return;
+
+                let maxSide = 400;
+                let maxCells = Math.max(M, N);
+                let size = maxSide / maxCells;
+
+                let c = idx % M, r = Math.floor(idx / M);
+                let x = c * size, y = r * size;
+                let pad = 20;
+
+                if (size < 60) pad = size * 0.25;
+
+                ctx.lineWidth = 8;
+                if (player === 'X') {
+                    ctx.strokeStyle = '#ffeb3b';
+                    ctx.beginPath();
+                    ctx.moveTo(x + pad, y + pad); ctx.lineTo(x + size - pad, y + size - pad);
+                    ctx.moveTo(x + size - pad, y + pad); ctx.lineTo(x + pad, y + size - pad);
+                    ctx.stroke();
+                } else {
+                    ctx.strokeStyle = '#007acc';
+                    ctx.beginPath();
+                    ctx.arc(x + size / 2, y + size / 2, size / 2 - pad, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+
+            async function playVis() {
+                if (!isRunning) return;
+                drawBoard();
+                let moves = getMoves();
+                let b = Array(TotalCells).fill(null);
+                let p = 'X';
+                let minW = 2 * K - 1;
+                if (minW < 1) minW = 1;
+
+                for (let i = 0; i < moves.length; i++) {
+                    if (!isRunning) break;
+                    b[moves[i]] = p;
+                    drawPiece(moves[i], p);
+                    if (i + 1 >= minW && check(b)) break;
+                    p = (p === 'X' ? 'O' : 'X');
+                    await new Promise(r => setTimeout(r, 100));
+                }
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            async function runSim() {
+                updateValues();
+                let sims = +inpSims.value;
+
+                winLines = getWinLines(M, N, K);
+
+                isRunning = true;
+                btnStart.disabled = true;
+                [inpSims, inpM, inpN, inpK].forEach(el => el.disabled = true);
+
+                status.textContent = '模擬進行中...';
+
+                renderGrid();
+                drawBoard();
+
+                (async () => { while (isRunning && cvsArea.style.display !== 'none') await playVis(); })();
+
+                let res = new Array(TotalCells + 1).fill(0);
+                let draws = 0, xWins = 0, oWins = 0;
+                let minW = 2 * K - 1;
+                if (minW < 1) minW = 1;
+                let lastYield = performance.now();
+
+                for (let i = 0; i < sims; i++) {
+                    if (!isRunning) break;
+
+                    let moves = getMoves();
+                    let b = Array(TotalCells).fill(null);
+                    let w = null, cnt = 0;
+
+                    for (let j = 0; j < TotalCells; j++) {
+                        b[moves[j]] = (j % 2 === 0 ? 'X' : 'O');
+                        cnt++;
+                        if (cnt >= minW) {
+                            w = check(b);
+                            if (w) break;
+                        }
+                    }
+
+                    if (w) {
+                        res[cnt]++;
+                        if (w === 'X') xWins++; else oWins++;
+                    } else draws++;
+
+                    // 效能優化：每 500 次檢查一次時間，降低效能開銷
+                    if ((i + 1) % 500 === 0) {
+                        let now = performance.now();
+                        // 解決手機端進度條卡頓/跳躍：確保相鄰兩次 UI 渲染間隔至少 40ms（避免堵塞主執行緒）
+                        if (now - lastYield > 40) {
+                            let done = i + 1;
+                            pBar.style.width = (done / sims * 100) + '%';
+                            status.textContent = `模擬進行中... ${Math.round(done / sims * 100)}%`;
+
+                            document.getElementById('txt-total').textContent = done.toLocaleString();
+                            document.getElementById('txt-xrate').textContent = (xWins / done * 100).toFixed(1) + '%';
+                            document.getElementById('txt-orate').textContent = (oWins / done * 100).toFixed(1) + '%';
+                            document.getElementById('txt-drate').textContent = (draws / done * 100).toFixed(1) + '%';
+
+                            for (let m = minW; m <= TotalCells; m++) {
+                                let el = document.getElementById('res-' + m);
+                                if (el) el.textContent = res[m].toLocaleString();
+                            }
+                            let elD = document.getElementById('res-draw');
+                            if (elD) elD.textContent = draws.toLocaleString();
+
+                            // 雙重保證：讓手機端瀏覽器強制進行一幀的 UI 重繪
+                            await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+                            lastYield = performance.now();
+                        }
+                    }
+                }
+
+                isRunning = false;
+                btnStart.disabled = false;
+                [inpSims, inpM, inpN, inpK].forEach(el => el.disabled = false);
+
+                status.textContent = `模擬完成！共 ${sims.toLocaleString()} 場`;
+                pBar.style.width = '100%';
+
+                document.getElementById('txt-total').textContent = sims.toLocaleString();
+                document.getElementById('txt-xrate').textContent = (xWins / sims * 100).toFixed(1) + '%';
+                document.getElementById('txt-orate').textContent = (oWins / sims * 100).toFixed(1) + '%';
+                document.getElementById('txt-drate').textContent = (draws / sims * 100).toFixed(1) + '%';
+                for (let m = minW; m <= TotalCells; m++) {
+                    let el = document.getElementById('res-' + m);
+                    if (el) el.textContent = res[m].toLocaleString();
+                }
+                let elD = document.getElementById('res-draw');
+                if (elD) elD.textContent = draws.toLocaleString();
+            }
+
+            init();
+        })();
+    </script>
 </body>
 
 </html>
